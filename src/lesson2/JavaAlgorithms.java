@@ -29,9 +29,7 @@ public class JavaAlgorithms {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
-    static public Pair<Integer, Integer> optimizeBuyAndSell(String inputName) {
-        throw new NotImplementedError();
-    }
+    static public Pair<Integer, Integer> optimizeBuyAndSell(String inputName) {throw new NotImplementedError();}
 
     /**
      * Задача Иосифа Флафия.
@@ -97,9 +95,42 @@ public class JavaAlgorithms {
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
      */
-    static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+    static public String longestCommonSubstring(String first, String second) {
+        char [] f = new char[first.length() + 1];
+        char [] s = new char[second.length() + 1];
+        f[0] = 'c';
+        s[0] = 'e';
+        for (int i = 1; i < f.length; i++) {
+            f[i] = first.charAt(i - 1);
+        }
+        for (int i = 1; i < s.length; i++) {
+            s[i] = second.charAt(i - 1);
+        }
+        int [][] matrix = new int[f.length + 1][s.length + 1];
+        for (int i = 0; i < f.length; i++) {
+            for (int j = 0; j < s.length; j++) {
+                if (i == 0 || j == 0) matrix[i][j] = 0;
+                else {
+                    if (f[i] != s[j]) matrix[i][j] = 0;
+                    else matrix[i][j] = matrix[i - 1][j - 1] + 1;
+                }
+            }
+        }
+        int k = 0;
+        int n = 0;
+        for (int i = 0; i < f.length; i++) {
+            for (int j = 0; j < s.length; j++) {
+                if (k < matrix[i][j]) {
+                    n = i;
+                    k = matrix[i][j];
+                }
+            }
+        }
+        if (k == 0) return "";
+        else return first.substring(n - k, n);
     }
+    //Трудоемкость T = O(N * M)
+    //Ресурсоемкость R = O(N * M)
 
     /**
      * Число простых чисел в интервале
@@ -112,6 +143,24 @@ public class JavaAlgorithms {
      * Единица простым числом не считается.
      */
     static public int calcPrimesNumber(int limit) {
-        throw new NotImplementedError();
+        if (limit <= 1) return 0;
+        boolean[] m = new boolean[limit + 1];
+        int k = -2;
+        for (int i = 0; i <= limit; i++) {
+            m[i] = true;
+        }
+        for (int i = 2; i * i <= limit; i++) {
+            if (m[i]) {
+                for (int j = i * i; j <= limit; j = j + i) {
+                    m[j] = false;
+                }
+            }
+        }
+        for (int i = 0; i <= limit; i++) {
+            if (m[i]) k++;
+        }
+        return k;
     }
+    //Трудоемкость T = O(Nlg(LgN))
+    //Ресурсоемкость R = O(N)
 }

@@ -2,6 +2,17 @@ package lesson1;
 
 import kotlin.NotImplementedError;
 
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 @SuppressWarnings("unused")
 public class JavaTasks {
     /**
@@ -35,8 +46,44 @@ public class JavaTasks {
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
     static public void sortTimes(String inputName, String outputName) {
-        throw new NotImplementedError();
+        if (!inputName.endsWith(".txt")) throw new IllegalArgumentException();
+        List<String> am = new ArrayList<>();
+        List<String> pm = new ArrayList<>();
+        List<String> am12 = new ArrayList<>();
+        List<String> pm12 = new ArrayList<>();
+        final Path path = Paths.get(inputName);
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("12")) {
+                    if (line.contains("AM")) am12.add(line);
+                    else pm12.add(line);
+                } else {
+                    if (line.contains("AM")) am.add(line);
+                    else pm.add(line);
+                }
+            }
+        } catch (IOException ignored) {
+        }
+        Collections.sort(am);
+        Collections.sort(pm);
+        Collections.sort(am12);
+        Collections.sort(pm12);
+        am12.addAll(am);
+        am12.addAll(pm12);
+        am12.addAll(pm);
+        try(FileWriter writer = new FileWriter(outputName))
+        {
+            for (String text : am12) {
+                writer.write(text + System.lineSeparator());
+            }
+            writer.close();
+        }
+        catch(IOException ignored){
+        }
     }
+    //Трудоемкость T = O(N*lg(N))
+    //Ресурсоемкость R = O(N)
 
     /**
      * Сортировка адресов
@@ -64,9 +111,7 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
-    static public void sortAddresses(String inputName, String outputName) {
-        throw new NotImplementedError();
-    }
+    static public void sortAddresses(String inputName, String outputName) {throw new NotImplementedError();}
 
     /**
      * Сортировка температур
@@ -99,7 +144,53 @@ public class JavaTasks {
      * 121.3
      */
     static public void sortTemperatures(String inputName, String outputName) {
-        throw new NotImplementedError();
+        if (!inputName.endsWith(".txt")) throw new IllegalArgumentException();
+        final Path path = Paths.get(inputName);
+        List<String> minus = new ArrayList<>();
+        List<String> plus = new ArrayList<>();
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("-")) minus.add(line);
+                else plus.add(line);
+            }
+        } catch (IOException ignored) {
+        }
+        int[] finalMinus = Sorts.countingSort(helper1(minus), 2730);
+        int[] finalPlus = Sorts.countingSort(helper1(plus), 5000);
+        for (int i = 0; i < finalMinus.length / 2; i++) {
+            int tmp = finalMinus[i];
+            finalMinus[i] = finalMinus[minus.size() - i - 1];
+            finalMinus[minus.size() - i - 1] = tmp;
+        }
+        try(FileWriter writer = new FileWriter(outputName))
+        {
+            for (int t : finalMinus) {
+                writer.write("-" + ((double) t) / 10 + System.lineSeparator());
+            }
+            for (int t : finalPlus) {
+                writer.write(((double) t) / 10 + System.lineSeparator());
+            }
+            writer.close();
+        }
+        catch(IOException ignored){
+        }
+    }
+    //Трудоемкость T = O(N + K)
+    //Ресурсоемкость R = O(K), где K - диапазон
+
+    private static int[] helper1(List<String> in){
+        int[] out = new int[in.size()];
+        for (int i = 0; i < in.size(); i++) {
+            double a;
+            String cur = in.get(i);
+            String[] yo = cur.split("\\.");
+            int first = Math.abs(Integer.parseInt(yo[0]));
+            int second = Integer.parseInt(yo[1]);
+            a = ((double) first + ((double) second) / 10) * 10;
+            out[i] = (int) a;
+        }
+        return out;
     }
 
     /**
@@ -132,8 +223,47 @@ public class JavaTasks {
      * 2
      */
     static public void sortSequence(String inputName, String outputName) {
-        throw new NotImplementedError();
+        if (!inputName.endsWith(".txt")) throw new IllegalArgumentException();
+        final Path path = Paths.get(inputName);
+        List<Integer> numbers = new ArrayList<>();
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int min = 0;
+        int k = 1;
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            String number;
+            while ((number = reader.readLine()) != null) {
+                numbers.add(Integer.parseInt(number));
+            }
+        } catch (IOException ignored) {
+        }
+        for (int number : numbers) {
+            if (map.get(number) != null) {
+                int s = map.get(number);
+                s++;
+                map.put(number, s);
+                if ((s > k) || (s == k && number < min)) {
+                    k = s;
+                    min = number;
+                }
+            } else map.put(number, 1);
+        }
+        final int finalMin = min;
+        numbers.removeIf(number -> (number == finalMin));
+        try(FileWriter writer = new FileWriter(outputName))
+        {
+            for (int number : numbers) {
+                writer.write(number + System.lineSeparator());
+            }
+            for (int i = 0; i < k; i++) {
+                writer.write(finalMin + System.lineSeparator());
+            }
+            writer.close();
+        }
+        catch(IOException ignored){
+        }
     }
+    //Трудоемкость T = O(N)
+    //Ресурсоемкость R = O(N)
 
     /**
      * Соединить два отсортированных массива в один

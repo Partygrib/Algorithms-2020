@@ -1,6 +1,8 @@
 package lesson1
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.assertThrows
 import util.PerfResult
 import util.estimate
 import java.io.BufferedWriter
@@ -8,10 +10,21 @@ import java.io.File
 import java.util.*
 import kotlin.math.abs
 import kotlin.system.measureNanoTime
+import kotlin.test.assertFailsWith
 
 abstract class AbstractTaskTests : AbstractFileTests() {
 
     protected fun sortTimes(sortTimes: (String, String) -> Unit) {
+        try {
+            Assertions.assertThrows(IllegalArgumentException::class.java) {
+                JavaTasks.sortSequence(
+                    "input/time_in4.rtf",
+                    "temp.txt"
+                )
+            }
+        } finally {
+            File("temp.txt").delete()
+        }
         try {
             sortTimes("input/time_in1.txt", "temp.txt")
             assertFileContent(
@@ -102,6 +115,16 @@ abstract class AbstractTaskTests : AbstractFileTests() {
 
     protected fun sortTemperatures(sortTemperatures: (String, String) -> Unit) {
         try {
+            Assertions.assertThrows(IllegalArgumentException::class.java) {
+                JavaTasks.sortTemperatures(
+                    "input/temp_in11.rtf",
+                    "temp.txt"
+                )
+            }
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
             sortTemperatures("input/temp_in1.txt", "temp.txt")
             assertFileContent(
                 "temp.txt",
@@ -182,6 +205,16 @@ abstract class AbstractTaskTests : AbstractFileTests() {
     }
 
     protected fun sortSequence(sortSequence: (String, String) -> Unit) {
+        try {
+            Assertions.assertThrows(IllegalArgumentException::class.java) {
+                JavaTasks.sortSequence(
+                    "input/seq_in11.rtf",
+                    "temp.txt"
+                )
+            }
+        } finally {
+            File("temp.txt").delete()
+        }
         try {
             sortSequence("input/seq_in1.txt", "temp.txt")
             assertFileContent(
