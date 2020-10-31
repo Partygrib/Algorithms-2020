@@ -45,14 +45,14 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
-    static public void sortTimes(String inputName, String outputName) {
+    static public void sortTimes(String inputName, String outputName) throws IOException {
         if (!inputName.endsWith(".txt")) throw new IllegalArgumentException();
         List<String> am = new ArrayList<>();
         List<String> pm = new ArrayList<>();
         List<String> am12 = new ArrayList<>();
         List<String> pm12 = new ArrayList<>();
         final Path path = Paths.get(inputName);
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
+        BufferedReader reader = Files.newBufferedReader(path);
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("12")) {
@@ -63,8 +63,6 @@ public class JavaTasks {
                     else pm.add(line);
                 }
             }
-        } catch (IOException ignored) {
-        }
         Collections.sort(am);
         Collections.sort(pm);
         Collections.sort(am12);
@@ -72,15 +70,11 @@ public class JavaTasks {
         am12.addAll(am);
         am12.addAll(pm12);
         am12.addAll(pm);
-        try(FileWriter writer = new FileWriter(outputName))
-        {
+        FileWriter writer = new FileWriter(outputName);
             for (String text : am12) {
                 writer.write(text + System.lineSeparator());
             }
-            writer.close();
-        }
-        catch(IOException ignored){
-        }
+        writer.close();
     }
     //Трудоемкость T = O(N*lg(N))
     //Ресурсоемкость R = O(N)
@@ -143,19 +137,17 @@ public class JavaTasks {
      * 99.5
      * 121.3
      */
-    static public void sortTemperatures(String inputName, String outputName) {
+    static public void sortTemperatures(String inputName, String outputName) throws IOException {
         if (!inputName.endsWith(".txt")) throw new IllegalArgumentException();
         final Path path = Paths.get(inputName);
         List<String> minus = new ArrayList<>();
         List<String> plus = new ArrayList<>();
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
+        BufferedReader reader = Files.newBufferedReader(path);
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("-")) minus.add(line);
                 else plus.add(line);
             }
-        } catch (IOException ignored) {
-        }
         int[] finalMinus = Sorts.countingSort(helper1(minus), 2730);
         int[] finalPlus = Sorts.countingSort(helper1(plus), 5000);
         for (int i = 0; i < finalMinus.length / 2; i++) {
@@ -163,8 +155,7 @@ public class JavaTasks {
             finalMinus[i] = finalMinus[minus.size() - i - 1];
             finalMinus[minus.size() - i - 1] = tmp;
         }
-        try(FileWriter writer = new FileWriter(outputName))
-        {
+        FileWriter writer = new FileWriter(outputName);
             for (int t : finalMinus) {
                 writer.write("-" + ((double) t) / 10 + System.lineSeparator());
             }
@@ -172,9 +163,6 @@ public class JavaTasks {
                 writer.write(((double) t) / 10 + System.lineSeparator());
             }
             writer.close();
-        }
-        catch(IOException ignored){
-        }
     }
     //Трудоемкость T = O(N + K)
     //Ресурсоемкость R = O(K), где K - диапазон
@@ -222,20 +210,18 @@ public class JavaTasks {
      * 2
      * 2
      */
-    static public void sortSequence(String inputName, String outputName) {
+    static public void sortSequence(String inputName, String outputName) throws IOException {
         if (!inputName.endsWith(".txt")) throw new IllegalArgumentException();
         final Path path = Paths.get(inputName);
         List<Integer> numbers = new ArrayList<>();
         HashMap<Integer, Integer> map = new HashMap<>();
         int min = 0;
         int k = 1;
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
-            String number;
-            while ((number = reader.readLine()) != null) {
-                numbers.add(Integer.parseInt(number));
+        BufferedReader reader = Files.newBufferedReader(path);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                numbers.add(Integer.parseInt(line));
             }
-        } catch (IOException ignored) {
-        }
         for (int number : numbers) {
             if (map.get(number) != null) {
                 int s = map.get(number);
@@ -249,8 +235,7 @@ public class JavaTasks {
         }
         final int finalMin = min;
         numbers.removeIf(number -> (number == finalMin));
-        try(FileWriter writer = new FileWriter(outputName))
-        {
+        FileWriter writer = new FileWriter(outputName);
             for (int number : numbers) {
                 writer.write(number + System.lineSeparator());
             }
@@ -258,9 +243,6 @@ public class JavaTasks {
                 writer.write(finalMin + System.lineSeparator());
             }
             writer.close();
-        }
-        catch(IOException ignored){
-        }
     }
     //Трудоемкость T = O(N)
     //Ресурсоемкость R = O(N)

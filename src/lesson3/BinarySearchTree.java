@@ -101,8 +101,61 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
      */
     @Override
     public boolean remove(Object o) {
-        // TODO
-        throw new NotImplementedError();
+        if (!contains(o)) return false;
+        Node<T> x = find((T) o);
+        Node<T> px = findParent(root, x);
+        boolean left = false;
+        if (x == null) return false;
+        if (px != null && px.left == x)
+            left = true;
+        if (x.left == null && x.right == null) // первый случай
+            conformity(px, x, left);
+        if (x.left == null || x.right == null) {     // второй случай
+            if (x.left == null)
+                conformity(px, x.right, left);
+            else conformity(px, x.left, left);
+        } else {                                  // третий случай
+            Node<T> z = minimum(x.right);
+            Node<T> pz = findParent(root, z);
+            Node<T> zr = z.right;
+            Node<T> xl = x.left;
+            Node<T> xr = x.right;
+            boolean mod = false;
+            if (pz.left == z && z.right != null)
+                mod = true;
+            conformity(px, z, left);
+            pz.left = null;
+            z.left = xl;
+            if (z != xr) z.right = xr;
+            if (mod) pz.left = zr;
+        }
+        size--;
+        return true;
+    }
+    //Трудоемкость T = O(h), где h — высота дерева
+    //Ресурсоемкость R = O(1)
+
+    public void conformity(Node<T> p, Node<T> x, boolean left) {
+        if (p == null) root = x;
+        else if (left) p.left = x;
+        else p.right = x;
+    }
+
+    public Node<T> minimum(Node<T> x) {
+        if (x.left == null) return x;
+        else return minimum(x.left);
+    }
+
+    public Node<T> findParent(Node<T> root1, Node<T> child) {
+        if (root1 == null) return null;
+        if(root1.left == null && root1.right == null)
+            return null;
+        if(root1.left == child || root1.right == child)
+            return root1;
+        Node<T> leftSearch = findParent(root1.left, child);
+        if (leftSearch != null)
+            return leftSearch;
+        return findParent(root1.right, child);
     }
 
     @Nullable
@@ -114,13 +167,17 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
     @NotNull
     @Override
     public Iterator<T> iterator() {
-        return new BinarySearchTreeIterator();
+        return new BinarySearchTreeIterator(root);
     }
 
     public class BinarySearchTreeIterator implements Iterator<T> {
 
-        private BinarySearchTreeIterator() {
-            // Добавьте сюда инициализацию, если она необходима.
+        private final Stack<Node<T>> stack = new Stack<>();
+
+        private T non = null;
+
+        private BinarySearchTreeIterator(Node<T> root) {
+            min(root);
         }
 
         /**
@@ -134,10 +191,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          * Средняя
          */
         @Override
-        public boolean hasNext() {
-            // TODO
-            throw new NotImplementedError();
-        }
+        public boolean hasNext() { return (!stack.isEmpty()); }
 
         /**
          * Получение следующего элемента
@@ -154,9 +208,21 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          */
         @Override
         public T next() {
-            // TODO
-            throw new NotImplementedError();
+            if (!hasNext()) throw new NoSuchElementException();
+            Node<T> node = stack.pop();
+            min(node.right);
+            non = node.value;
+            return node.value;
         }
+
+        private void min(Node<T> node) {
+            if (node != null) {
+                stack.push(node);
+                min(node.left);
+            }
+        }
+        //Трудоемкость T = O(log(n))
+        //Ресурсоемкость R = O(log(n))
 
         /**
          * Удаление предыдущего элемента
@@ -172,9 +238,12 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          */
         @Override
         public void remove() {
-            // TODO
-            throw new NotImplementedError();
+            if (non == null || !BinarySearchTree.this.contains(non))
+                throw new IllegalStateException();
+            BinarySearchTree.this.remove(non);
         }
+        //Трудоемкость T = O(h), где h — высота дерева
+        //Ресурсоемкость R = O(1)
     }
 
     /**
