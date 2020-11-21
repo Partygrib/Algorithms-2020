@@ -2,6 +2,8 @@ package lesson7;
 
 import kotlin.NotImplementedError;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -19,8 +21,51 @@ public class JavaDynamicTasks {
      * При сравнении подстрок, регистр символов *имеет* значение.
      */
     public static String longestCommonSubSequence(String first, String second) {
-        throw new NotImplementedError();
+        char [] x = new char[first.length() + 1];
+        char [] y = new char[second.length() + 1];
+        x[0] = 'c';
+        y[0] = 'e';
+        for (int i = 1; i < x.length; i++) {
+            x[i] = first.charAt(i - 1);
+        }
+        for (int i = 1; i < y.length; i++) {
+            y[i] = second.charAt(i - 1);
+        }
+        int[][] m = new int[x.length][y.length];
+        ArrayList<Character> list = new ArrayList<>();
+        for (int i = 0; i < x.length; i++) {
+            for (int j = 0; j < y.length; j++) {
+                if (i == 0 || j == 0) m[i][j] = 0;
+                else {
+                    if (y[j] == x[i]) {
+                        m[i][j] = m[i - 1][j - 1] + 1;
+                    }
+                    else m[i][j] = Math.max(m[i - 1][j], m[i][j - 1]);
+                }
+            }
+        }
+        int ix = x.length - 1;
+        int jy = y.length - 1;
+        while (ix > 0 && jy > 0) {
+            if (x[ix] == y[jy]) {
+                list.add(x[ix]);
+                ix--;
+                jy--;
+            }
+            else {
+                if (m[ix - 1][jy] > m[ix][jy - 1]) ix--;
+                else jy--;
+            }
+        }
+        Collections.reverse(list);
+        StringBuilder sb = new StringBuilder();
+        for (Character ch: list) {
+            sb.append(ch);
+        }
+        return sb.toString();
     }
+    //Трудоемкость T = O(N * M)
+    //Ресурсоемкость R = O(N * M)
 
     /**
      * Наибольшая возрастающая подпоследовательность
@@ -35,8 +80,38 @@ public class JavaDynamicTasks {
      * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
      */
     public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
-        throw new NotImplementedError();
+        if (list.isEmpty()) return list;
+        int n = list.size();
+        int[] a = new int[n];
+        int[] b = new int[n];
+        ArrayList<Integer> result = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            a[i] = 1;
+            b[i] = -1;
+            for (int j = 0; j < n; j++) {
+                if (list.get(j) < list.get(i) && a[j] + 1 > a[i]) {
+                    a[i] = a[j] + 1;
+                    b[i] = j;
+                }
+            }
+        }
+        int last = 0;
+        int length = 0;
+        for (int i = 0; i < n; i++) {
+            if (a[i] > length) {
+                last = i;
+                length = a[i];
+            }
+        }
+        while (last != -1) {
+            result.add(list.get(last));
+            last = b[last];
+        }
+        Collections.reverse(result);
+        return result;
     }
+    //Трудоемкость T = O(N^2)
+    //Ресурсоемкость R = O(N)
 
     /**
      * Самый короткий маршрут на прямоугольном поле.
