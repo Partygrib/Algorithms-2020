@@ -121,6 +121,23 @@ abstract class AbstractGraphTests {
         }.build()
         val loop3 = graph3.findEulerLoop()
         loop3.assert(shouldExist = false, graph = graph3)
+
+        val graph4 = GraphBuilder().apply {
+            val a = addVertex("A")
+            val b = addVertex("B")
+            val c = addVertex("C")
+            val d = addVertex("D")
+            val e = addVertex("E")
+            val h = addVertex("H")
+            addConnection(a, b)
+            addConnection(a, c)
+            addConnection(b, c)
+            addConnection(d, e)
+            addConnection(d, h)
+            addConnection(h, e)
+        }.build()
+        val loop4 = graph4.findEulerLoop()
+        loop4.assert(shouldExist = false, graph = graph4)
     }
 
     fun minimumSpanningTree(minimumSpanningTree: Graph.() -> Graph) {
@@ -351,6 +368,29 @@ abstract class AbstractGraphTests {
         }.build()
         val longestPath3 = graph3.longestSimplePath()
         assertEquals(6, longestPath3.length)
+
+        val graph4 = GraphBuilder().apply {
+            val a = addVertex("A")
+            val b = addVertex("B")
+            val c = addVertex("C")
+            val d = addVertex("D")
+            val e = addVertex("E")
+            val g = addVertex("G")
+            val h = addVertex("H")
+            val k = addVertex("K")
+            addConnection(d, e)
+            addConnection(e, g)
+            addConnection(g, d)
+            addConnection(g, h)
+            addConnection(h, k)
+            addConnection(k, g)
+            addConnection(a, b)
+            addConnection(b, c)
+            addConnection(a, c)
+
+        }.build()
+        val longestPath4 = graph4.longestSimplePath()
+        assertEquals(4, longestPath4.length)
     }
 
     fun baldaSearcher(baldaSearcher: (String, Set<String>) -> Set<String>) {

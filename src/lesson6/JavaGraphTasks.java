@@ -2,8 +2,7 @@ package lesson6;
 
 import kotlin.NotImplementedError;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class JavaGraphTasks {
@@ -34,9 +33,70 @@ public class JavaGraphTasks {
      * связного графа ровно по одному разу
      */
     public static List<Graph.Edge> findEulerLoop(Graph graph) {
-        throw new NotImplementedError();
+        ArrayList<Graph.Edge> result = new ArrayList<>();
+        ArrayList<Graph.Vertex> listV = new ArrayList<>();
+        ArrayDeque<Graph.Vertex> stack = new ArrayDeque<>();
+        Graph.Vertex x = null;
+        Set<Graph.Edge> setE = graph.getEdges();
+        if (graph.getVertices().isEmpty() || dfs(graph)) return result;
+        for (Graph.Vertex v : graph.getVertices()) {
+            x = v;
+            if (graph.getNeighbors(v).size() % 2 == 1)
+                return result;
+        }
+        stack.push(x);
+        while (!stack.isEmpty()) {
+            Graph.Vertex y = stack.peek();
+            boolean mod = false;
+                for (Graph.Vertex e : graph.getVertices()) {
+                    if (setE.contains(graph.getConnection(y, e))) {
+                        stack.push(e);
+                        setE.remove(graph.getConnection(y, e));
+                        mod = true;
+                        break;
+                    }
+                }
+            if (!mod) {
+                stack.pop();
+                listV.add(y);
+            }
+        }
+        setE = graph.getEdges();
+        for (int i = 0; i < listV.size() - 1; i++) {
+            if (setE.contains(graph.getConnection(listV.get(i), listV.get(i + 1)))) {
+                result.add(graph.getConnection(listV.get(i), listV.get(i + 1)));
+                setE.remove(graph.getConnection(listV.get(i), listV.get(i + 1)));
+            }
+        }
+        return result;
     }
+    //Трудоемкость T = O(N*M)
+    //Ресурсоемкость R = O(N)
 
+    static boolean dfs(Graph graph) {
+        ArrayDeque<Graph.Vertex> stack = new ArrayDeque<>();
+        HashMap<Graph.Vertex, Boolean> map = new HashMap<>();
+        Graph.Vertex x = null;
+        for (Graph.Vertex v : graph.getVertices()) {
+            map.put(v,false);
+        }
+        for (Graph.Vertex v : graph.getVertices()) {
+            x = v;
+            break;
+        }
+        stack.push(x);
+        while (!stack.isEmpty()) {
+            Graph.Vertex y = stack.pop();
+            if (!map.get(y)) {
+                map.remove(y);
+                map.put(y, true);
+                for (Graph.Vertex v : graph.getNeighbors(y)) {
+                    if (!map.get(v)) stack.push(v);
+                }
+            }
+        }
+        return map.containsValue(false);
+    }
     /**
      * Минимальное остовное дерево.
      * Средняя
@@ -115,13 +175,34 @@ public class JavaGraphTasks {
      * |    |    |    |
      * E    F -- I    |
      * |              |
-     * J ------------ K
+     * J ----------- -K
      *
      * Ответ: A, E, J, K, D, C, H, G, B, F, I
      */
     public static Path longestSimplePath(Graph graph) {
-        throw new NotImplementedError();
+        Path result = new Path();
+        Set<Graph.Vertex> setV = graph.getVertices();
+        ArrayDeque<Path> stack = new ArrayDeque<>();
+        int k = 0;
+        if (setV.isEmpty()) return result;
+        for (Graph.Vertex v : setV) {
+            stack.push(new Path((v)));
+        }
+        while (!stack.isEmpty()) {
+            Path p = stack.pop();
+            if (p.getLength() > k) {
+                result = p;
+                k = result.getLength();
+            }
+            Set<Graph.Vertex> set = graph.getNeighbors(p.getVertices().get(p.getLength()));
+            for (Graph.Vertex n : set) {
+                if (!p.contains(n)) stack.push(new Path(p, graph, n));
+            }
+        }
+        return result;
     }
+    //Трудоемкость T = O(N!)
+    //Ресурсоемкость R = O(N!)
 
 
     /**
